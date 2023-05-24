@@ -44,16 +44,28 @@ def get_current_date():
     date = r.json()["date"]
     return date
 def main():
-
+    failed_connect = 0
     tft.init()
-    tft.fill(st7789.BLUE)
-    weather_data = get_current_forecast()
-    current_date = get_current_date()
-
+    tft.fill(st7789.BLACK)
+    try:
+        weather_data = get_current_forecast()
+        current_date = get_current_date()
+    except Exception as e:
+        pass
     while True:
-        r = urequests.get("http://192.168.1.4:5000")  # Server that returns the current GMT+0 time.
-        date = r.json()["date"]
-        time = r.json()["time"]
+        if failed_connect == 1:
+            tft.fill(st7789.BLACK)
+        try:
+            r = urequests.get("http://192.168.1.4:5000")  # Server that returns the current GMT+0 time.
+            failed_connect = 0
+            date = r.json()["date"]
+            time = r.json()["time"]
+        except Exception as e:
+            tft.fill(st7789.BLACK)
+            failed_connect = 1
+            tft.text(smallFont, "Failed to Reach Server.", 0, 0, st7789.GREEN, st7789.BLUE)
+            utime.sleep(2)
+            continue
         if date != current_date:
             current_date = get_current_date()
             weather_data = get_current_forecast()
@@ -66,12 +78,6 @@ def main():
         tft.text(medFont, (f"Max Temp:{weather_data['forecast']['forecastday'][0]['day']['maxtemp_f']}F"), 0, 120, st7789.GREEN, st7789.BLUE)
         # min temp
         tft.text(medFont, (f"Min Temp:{weather_data['forecast']['forecastday'][0]['day']['mintemp_f']}F"), 0, 150, st7789.GREEN, st7789.BLUE)
-
-    #while True:
-        #tft.fill(st7789.RED)
-        #center("Hello")
-        #utime.sleep(2)
-    #tft.fill(st7789.BLACK)
 
 
 main()
