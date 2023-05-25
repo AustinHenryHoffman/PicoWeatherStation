@@ -39,10 +39,13 @@ def get_current_forecast():
     #looks = data['current']['text']
     return weather_data
 
+
 def get_current_date():
     r = urequests.get("http://192.168.1.4:5000")  # Server that returns the current GMT+0 time.
     date = r.json()["date"]
     return date
+
+
 def main():
     failed_connect = 0
     tft.init()
@@ -63,7 +66,7 @@ def main():
         except Exception as e:
             tft.fill(st7789.BLACK)
             failed_connect = 1
-            tft.text(smallFont, "Failed to Reach Server.", 0, 0, st7789.GREEN, st7789.BLUE)
+            tft.text(smallFont, "Failed to Reach Time Server.", 0, 0, st7789.GREEN, st7789.BLUE)
             utime.sleep(2)
             continue
         if date != current_date:
@@ -71,13 +74,24 @@ def main():
             weather_data = get_current_forecast()
         tft.text(bigFont, date, 80, 0, st7789.GREEN, st7789.BLUE)
         tft.text(bigFont, time, 90, 30, st7789.GREEN, st7789.BLUE)
-        tft.text(medFont, str(weather_data['current']['condition']['text']), 0, 60, st7789.GREEN, st7789.BLUE)
+        # condition
+        current_condition = str(weather_data['current']['condition']['text'])
+        if current_condition == "Sunny":
+            tft.text(medFont, str(weather_data['current']['condition']['text']), 0, 60, st7789.YELLOW, st7789.BLUE)
+        else:
+            tft.text(medFont, str(weather_data['current']['condition']['text']), 0, 60, st7789.YELLOW, st7789.BLUE)
         # current temp
-        tft.text(medFont, (f"Current Temp:{weather_data['current']['temp_f']}F"), 0, 90, st7789.GREEN, st7789.BLUE)
+        tft.text(medFont, f"Current Temp:{weather_data['current']['temp_f']}F", 0, 90, st7789.GREEN, st7789.BLUE)
         # max temp
-        tft.text(medFont, (f"Max Temp:{weather_data['forecast']['forecastday'][0]['day']['maxtemp_f']}F"), 0, 120, st7789.GREEN, st7789.BLUE)
+        max_temp = weather_data['forecast']['forecastday'][0]['day']['maxtemp_f']
+        if float(max_temp) >= float(90):
+            tft.text(medFont, f"Max Temp:{weather_data['forecast']['forecastday'][0]['day']['maxtemp_f']}F", 0, 120, st7789.RED, st7789.BLUE)
+        else:
+            tft.text(medFont, f"Max Temp:{weather_data['forecast']['forecastday'][0]['day']['maxtemp_f']}F", 0, 120, st7789.GREEN, st7789.BLUE)
         # min temp
-        tft.text(medFont, (f"Min Temp:{weather_data['forecast']['forecastday'][0]['day']['mintemp_f']}F"), 0, 150, st7789.GREEN, st7789.BLUE)
+        tft.text(medFont, f"Min Temp:{weather_data['forecast']['forecastday'][0]['day']['mintemp_f']}F", 0, 150, st7789.GREEN, st7789.BLUE)
+        # Rain?
+        tft.text(medFont, f"Rain:{weather_data['forecast']['forecastday'][0]['day']['daily_chance_of_rain']}% Chance", 0, 180, st7789.GREEN, st7789.BLUE)
 
 
 main()
