@@ -70,11 +70,12 @@ def get_current_date():
 def print_weather_data(weather_data):
     # condition
     current_condition = str(weather_data[0])
+    print(current_condition)
     if current_condition == "Sunny":
         tft.text(smallFont, str(weather_data[0]), 0, 65, st7789.YELLOW, st7789.BLUE)
-    if current_condition == "Clear":
+    elif current_condition == "Clear":
         tft.text(smallFont, str(weather_data[0]), 0, 65, st7789.WHITE, st7789.BLUE)
-    if current_condition == "Partly cloudy":
+    elif current_condition == "Partly cloudy":
         tft.text(smallFont, str(weather_data[0]), 0, 65, st7789.BLACK, st7789.BLUE)
     else:
         tft.text(smallFont, str(weather_data[0]), 0, 65, st7789.GREEN, st7789.BLUE)
