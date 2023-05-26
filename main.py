@@ -56,7 +56,8 @@ def get_current_forecast():
     max_temp = weather_data['forecast']['forecastday'][0]['day']['maxtemp_f']
     min_temp = weather_data['forecast']['forecastday'][0]['day']['mintemp_f']
     rain = weather_data['forecast']['forecastday'][0]['day']['daily_chance_of_rain']
-    weather_data = [current_condition, current_temp, max_temp, min_temp, rain, weather_data]
+    moon_phase = weather_data['forecast']['forecastday'][0]['astro']['moon_phase']
+    weather_data = [current_condition, current_temp, max_temp, min_temp, rain, moon_phase]
     return weather_data
 
 
@@ -93,6 +94,9 @@ def print_weather_data(weather_data):
     # Rain?
     tft.text(smallFont, f"Rain:{weather_data[4]}% Chance", 0,
              145, st7789.GREEN, st7789.BLUE)
+    #moon phase
+    tft.text(smallFont, f"Moon Phase:{weather_data[5]}", 0,
+             165, st7789.GREEN, st7789.BLUE)
 
 def print_indoor_climate():
     temperature = "%0.2f" % (sensor.temperature * 1.8 + 32)
