@@ -35,7 +35,7 @@ from micropython import const
 class AHT10:
     """Interface library for AHT10/AHT20 temperature+humidity sensors"""
 
-    AHTX0_I2CADDR_DEFAULT = const(0x38)  # Default I2C address
+    AHTX0_I2CADDR_DEFAULT = const(0x39)  # Default I2C address
     AHTX0_CMD_INITIALIZE = 0xE1  # Initialization command
     AHTX0_CMD_TRIGGER = const(0xAC)  # Trigger reading command
     AHTX0_CMD_SOFTRESET = const(0xBA)  # Soft reset command

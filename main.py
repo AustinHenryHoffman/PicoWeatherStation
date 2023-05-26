@@ -6,8 +6,8 @@ import vga2_16x32 as medFont
 import vga1_8x16 as smallFont
 import network   # handles connecting to WiFi
 import urequests    # handles making and servicing network requests
-# from machine import Pin, I2C
-# import ahtx0
+from machine import Pin, I2C
+import ahtx0
 
 tft = tft_config.config(3)
 # Connect to network
@@ -19,6 +19,20 @@ ssid = 'Tauttechsystems'
 password = 'Ellajane4485!'
 wlan.connect(ssid, password)
 
+#AHT 10 init
+i2c2 = I2C(1, scl=Pin(27), sda=Pin(26))
+
+"""
+used to get the device i2c address which needs to be updated in the ahtx0 driver
+devices = i2c2.scan()
+0x39
+if devices:
+    for d in devices:
+        print(hex(d))
+"""
+
+# Create the sensor object using I2C
+sensor = ahtx0.AHT10(i2c2)
 
 def center(text):
     length = 1 if isinstance(text, int) else len(text)
@@ -56,30 +70,37 @@ def print_weather_data(weather_data):
     # condition
     current_condition = str(weather_data[0])
     if current_condition == "Sunny":
-        tft.text(medFont, str(weather_data[0]), 0, 60, st7789.YELLOW, st7789.BLUE)
+        tft.text(smallFont, str(weather_data[0]), 0, 65, st7789.YELLOW, st7789.BLUE)
     if current_condition == "Clear":
-        tft.text(medFont, str(weather_data[0]), 0, 60, st7789.WHITE, st7789.BLUE)
+        tft.text(smallFont, str(weather_data[0]), 0, 65, st7789.WHITE, st7789.BLUE)
     if current_condition == "Partly cloudy":
-        tft.text(medFont, str(weather_data[0]), 0, 60, st7789.BLACK, st7789.BLUE)
+        tft.text(smallFont, str(weather_data[0]), 0, 65, st7789.BLACK, st7789.BLUE)
     else:
-        tft.text(medFont, str(weather_data[0]), 0, 60, st7789.GREEN, st7789.BLUE)
+        tft.text(smallFont, str(weather_data[0]), 0, 65, st7789.GREEN, st7789.BLUE)
     # current temp
-    tft.text(medFont, f"Current Temp:{weather_data[1]}F", 0, 90, st7789.GREEN, st7789.BLUE)
+    tft.text(smallFont, f"Current Temp:{weather_data[1]}F", 0, 85, st7789.GREEN, st7789.BLUE)
     # max temp
     max_temp = weather_data[2]
     if float(max_temp) >= float(90):
-        tft.text(medFont, f"High Temp:{weather_data[2]}F", 0, 120,
+        tft.text(smallFont, f"High Temp:{weather_data[2]}F", 0, 105,
                  st7789.RED, st7789.BLUE)
     else:
-        tft.text(medFont, f"Max Temp:{weather_data[2]}F", 0, 120,
+        tft.text(smallFont, f"Max Temp:{weather_data[2]}F  ", 0, 105,
                  st7789.GREEN, st7789.BLUE)
     # min temp
-    tft.text(medFont, f"Low Temp:{weather_data[3]}F", 0, 150,
+    tft.text(smallFont, f"Low Temp:{weather_data[3]}F", 0, 125,
              st7789.GREEN, st7789.BLUE)
     # Rain?
-    tft.text(medFont, f"Rain:{weather_data[4]}% Chance", 0,
-             180, st7789.GREEN, st7789.BLUE)
+    tft.text(smallFont, f"Rain:{weather_data[4]}% Chance", 0,
+             145, st7789.GREEN, st7789.BLUE)
 
+def print_indoor_climate():
+    temperature = "%0.2f" % (sensor.temperature * 1.8 + 32)
+    humidity = "%0.2f" % sensor.relative_humidity
+    length = len(str(temperature))+1
+    tft.text(smallFont, f"{temperature}F", tft.width() - length * smallFont.WIDTH, 65, st7789.GREEN, st7789.BLUE)
+    length = len(str(humidity)) + 1
+    tft.text(smallFont, f"{humidity}%", tft.width() - length * smallFont.WIDTH, 85, st7789.GREEN, st7789.BLUE)
 
 def main():
     failed_connect = 0
@@ -114,12 +135,13 @@ def main():
             print_weather_data(weather_data)
             print("weather data refreshed")
         # refresh weather data every hour
-        if minute == "59" and int(second) > 57:
+        if minute == "59" and int(second) > 58:
             weather_data = get_current_forecast()
             print_weather_data(weather_data)
             print("weather data refreshed")
         tft.text(bigFont, date, 80, 0, st7789.GREEN, st7789.BLUE)
         tft.text(bigFont, time, 90, 30, st7789.GREEN, st7789.BLUE)
+        print_indoor_climate()
 
 
 main()
