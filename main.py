@@ -2,7 +2,6 @@ import utime
 import st7789
 import tft_config
 import vga2_bold_16x32 as bigFont
-import vga2_16x32 as medFont
 import vga1_8x16 as smallFont
 import network   # handles connecting to WiFi
 import urequests    # handles making and servicing network requests
@@ -72,12 +71,16 @@ def print_weather_data(weather_data):
     current_condition = str(weather_data[0])
     print(current_condition)
     if current_condition == "Sunny":
+        tft.fill_rect(0, 65, 160, smallFont.HEIGHT, st7789.BLACK)
         tft.text(smallFont, str(weather_data[0]), 0, 65, st7789.YELLOW, st7789.BLUE)
     elif current_condition == "Clear":
+        tft.fill_rect(0, 65, 160, smallFont.HEIGHT, st7789.BLACK)
         tft.text(smallFont, str(weather_data[0]), 0, 65, st7789.WHITE, st7789.BLUE)
     elif current_condition == "Partly cloudy":
+        tft.fill_rect(0, 65, 160, smallFont.HEIGHT, st7789.BLACK)
         tft.text(smallFont, str(weather_data[0]), 0, 65, st7789.BLACK, st7789.BLUE)
     else:
+        tft.fill_rect(0, 65, 160, smallFont.HEIGHT, st7789.BLACK)
         tft.text(smallFont, str(weather_data[0]), 0, 65, st7789.GREEN, st7789.BLUE)
     # current temp
     tft.text(smallFont, f"Current Temp:{weather_data[1]}F", 0, 85, st7789.GREEN, st7789.BLUE)
@@ -96,6 +99,7 @@ def print_weather_data(weather_data):
     tft.text(smallFont, f"Rain:{weather_data[4]}% Chance", 0,
              145, st7789.GREEN, st7789.BLUE)
     #moon phase
+    tft.fill_rect(0, 165, 300, smallFont.HEIGHT, st7789.BLACK)
     tft.text(smallFont, f"Moon Phase:{weather_data[5]}", 0,
              165, st7789.GREEN, st7789.BLUE)
 
@@ -115,6 +119,7 @@ def main():
         weather_data = get_current_forecast()
         current_date = get_current_date()
         print_weather_data(weather_data)
+
     except Exception as e:
         pass
     while True:
@@ -139,7 +144,7 @@ def main():
             weather_data = get_current_forecast()
             print_weather_data(weather_data)
             print("weather data refreshed")
-        # refresh weather data every hour
+        # refresh weather data every half hour
         if minute == "59" and int(second) > 58:
             weather_data = get_current_forecast()
             print_weather_data(weather_data)
