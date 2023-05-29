@@ -46,7 +46,9 @@ def center(text):
 
 def get_current_forecast():
     # r = urequests.get("http://api.weatherapi.com/v1/forecast.json?key=1523873bc3d04c4f823185542232405&q=63031&days=2&aqi=no&alerts=no")
-    r = urequests.get("http://api.weatherapi.com/v1/forecast.json?key=1523873bc3d04c4f823185542232405&q=63031&days=1&aqi=no&alerts=no")
+    # new experiemental http://api.weatherapi.com/v1/forecast.json?key=1523873bc3d04c4f823185542232405&q=63031&days=1&aqi=no&alerts=yes
+    # OLD and WORKING "http://api.weatherapi.com/v1/forecast.json?key=1523873bc3d04c4f823185542232405&q=63031&days=1&aqi=no&alerts=no"
+    r = urequests.get("http://api.weatherapi.com/v1/forecast.json?key=1523873bc3d04c4f823185542232405&q=63031&days=1&aqi=no&alerts=yes")
     weather_data = r.json()
     """The plan here is to return only the data that I need rather than keep the entire json stored in memory. This
     should resolve the memory errors that I was getting when attempting to refresh weather data."""
@@ -56,7 +58,8 @@ def get_current_forecast():
     min_temp = weather_data['forecast']['forecastday'][0]['day']['mintemp_f']
     rain = weather_data['forecast']['forecastday'][0]['day']['daily_chance_of_rain']
     moon_phase = weather_data['forecast']['forecastday'][0]['astro']['moon_phase']
-    weather_data = [current_condition, current_temp, max_temp, min_temp, rain, moon_phase]
+    alerts = weather_data['alerts']['alert'][0]['headline']
+    weather_data = [current_condition, current_temp, max_temp, min_temp, rain, moon_phase, alerts]
     return weather_data
 
 
@@ -64,6 +67,48 @@ def get_current_date():
     r = urequests.get("http://192.168.1.4:5000")  # Server that returns the current GMT+0 time.
     date = r.json()["date"]
     return date
+
+
+SCREEN_WIDTH = 320
+SCREEN_HEIGHT = 240
+CHAR_WIDTH = 6  # Width of each character
+print(f"small Font width: {smallFont.WIDTH}")
+print(f"small Font height: {smallFont.HEIGHT}")
+CHAR_HEIGHT = 16  # Height of each character
+# Function to print text with wrapping
+
+
+def print_wrapped_text(text, y):
+    x = 0
+    y = y
+    max_lines = SCREEN_HEIGHT // CHAR_HEIGHT
+    max_chars_per_line = SCREEN_WIDTH // CHAR_WIDTH
+
+    # Split the text into words
+    words = text.split()
+
+    for word in words:
+        word_length = len(word)
+        if x + word_length * CHAR_WIDTH >= SCREEN_WIDTH:
+            # If the word exceeds the screen width, move to the next line
+            x = 0
+            y += CHAR_HEIGHT
+            if y >= SCREEN_HEIGHT:
+                break
+
+        # Print the word
+        # disp.draw_text((x, y), word)
+        tft.text(smallFont, word, x, y, st7789.RED, st7789.BLUE)
+
+        # Update the x coordinate for the next word
+        x += word_length * CHAR_WIDTH + CHAR_WIDTH
+
+        if x >= SCREEN_WIDTH:
+            # If the x coordinate exceeds the screen width, move to the next line
+            x = 0
+            y += CHAR_HEIGHT
+            if y >= SCREEN_HEIGHT:
+                break
 
 
 def print_weather_data(weather_data):
@@ -98,10 +143,20 @@ def print_weather_data(weather_data):
     # Rain?
     tft.text(smallFont, f"Rain:{weather_data[4]}% Chance", 0,
              145, st7789.GREEN, st7789.BLUE)
-    #moon phase
+    # moon phase
     tft.fill_rect(0, 165, 300, smallFont.HEIGHT, st7789.BLACK)
     tft.text(smallFont, f"Moon Phase:{weather_data[5]}", 0,
              165, st7789.GREEN, st7789.BLUE)
+    # Alerts
+    tft.fill_rect(0, 185, 300, smallFont.HEIGHT, st7789.BLACK)
+    print_wrapped_text(f"Alert:{weather_data[6]}", 185)
+    #print(int(len(f"Alert:{weather_data[6]}"))*smallFont.WIDTH)
+
+    #if int(len(f"Alert:{weather_data[6]}"))*smallFont.WIDTH) > 320:
+
+
+    #tft.text(smallFont, f"Alert:{weather_data[6]}", 0,
+             #185, st7789.RED, st7789.BLUE)
 
 def print_indoor_climate():
     temperature = "%0.2f" % (sensor.temperature * 1.8 + 32)
