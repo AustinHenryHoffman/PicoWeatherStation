@@ -21,7 +21,6 @@ with open("./etc/network_config.json", "r") as file:
 print(config_data)
 
 network_info = config_data["network"]
-
 ssid = network_info["ssid"]
 password = network_info["network_password"]
 wlan.connect(ssid, password)
@@ -41,6 +40,14 @@ if devices:
 # Create the sensor object using I2C
 sensor = ahtx0.AHT10(i2c2)
 
+SCREEN_WIDTH = 320
+SCREEN_HEIGHT = 240
+CHAR_WIDTH = 6  # Width of each character
+print(f"small Font width: {smallFont.WIDTH}")
+print(f"small Font height: {smallFont.HEIGHT}")
+CHAR_HEIGHT = 16  # Height of each character
+# Function to print text with wrapping
+
 
 def set_pico_time_from_server():
 
@@ -59,8 +66,8 @@ def print_pico_time():
     year, month, day, weekday, hours, minutes, seconds, subseconds = rtc.datetime()
     current_date = "{:04d}-{:02d}-{:02d}".format(year, month, day)
     current_time = "{:02d}:{:02d}:{:02d}".format(hours, minutes, seconds)
-    print("Current Date:", current_date)
-    print("Current time:", current_time)
+    # print("Current Date:", current_date)
+    # print("Current time:", current_time)
     date_time = [current_date, current_time]
     return date_time
 
@@ -99,15 +106,6 @@ def get_current_date():
     r = urequests.get("http://192.168.1.4:5000/datetime")  # Server that returns the current GMT+0 time.
     date = r.json()["date"]
     return date
-
-
-SCREEN_WIDTH = 320
-SCREEN_HEIGHT = 240
-CHAR_WIDTH = 6  # Width of each character
-print(f"small Font width: {smallFont.WIDTH}")
-print(f"small Font height: {smallFont.HEIGHT}")
-CHAR_HEIGHT = 16  # Height of each character
-# Function to print text with wrapping
 
 
 def print_wrapped_text(text, y):
@@ -184,10 +182,12 @@ def print_weather_data(weather_data):
 def print_indoor_climate(date, time):
     temperature = "%0.2f" % (sensor.temperature * 1.8 + 32)
     humidity = "%0.2f" % sensor.relative_humidity
+    length = len("Indoor Climate:")
+    tft.text(smallFont, "Indoor Climate:", tft.width() - length * smallFont.WIDTH, 65, st7789.GREEN, st7789.BLUE)
     length = len(str(temperature))+1
-    tft.text(smallFont, f"{temperature}F", tft.width() - length * smallFont.WIDTH, 65, st7789.GREEN, st7789.BLUE)
+    tft.text(smallFont, f"{temperature}F", tft.width() - length * smallFont.WIDTH, 85, st7789.GREEN, st7789.BLUE)
     length = len(str(humidity)) + 1
-    tft.text(smallFont, f"{humidity}%", tft.width() - length * smallFont.WIDTH, 85, st7789.GREEN, st7789.BLUE)
+    tft.text(smallFont, f"{humidity}%", tft.width() - length * smallFont.WIDTH, 105, st7789.GREEN, st7789.BLUE)
     data = {
         'date': date,
         'time': time,
@@ -197,8 +197,12 @@ def print_indoor_climate(date, time):
     }
     # log only on even minutes
     # if int(time.split(":")[1]) % 10 == 0:
-    response = urequests.post('http://192.168.1.4:5000/climate', json=data)
-    print(response.text)
+    try:
+        response = urequests.post('http://192.168.1.4:5000/climate', json=data)
+        print(response.text)
+    except Exception as e:
+        print(e)
+        pass
 
 
 def main():
