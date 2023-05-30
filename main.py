@@ -43,10 +43,9 @@ sensor = ahtx0.AHT10(i2c2)
 SCREEN_WIDTH = 320
 SCREEN_HEIGHT = 240
 CHAR_WIDTH = 6  # Width of each character
-print(f"small Font width: {smallFont.WIDTH}")
-print(f"small Font height: {smallFont.HEIGHT}")
 CHAR_HEIGHT = 16  # Height of each character
-# Function to print text with wrapping
+# print(f"small Font width: {smallFont.WIDTH}")
+# print(f"small Font height: {smallFont.HEIGHT}")
 
 
 def set_pico_time_from_server():
@@ -84,13 +83,10 @@ def center(text):
 
 
 def get_current_forecast():
-    # r = urequests.get("http://api.weatherapi.com/v1/forecast.json?key=1523873bc3d04c4f823185542232405&q=63031&days=2&aqi=no&alerts=no")
-    # new experiemental http://api.weatherapi.com/v1/forecast.json?key=1523873bc3d04c4f823185542232405&q=63031&days=1&aqi=no&alerts=yes
-    # OLD and WORKING "http://api.weatherapi.com/v1/forecast.json?key=1523873bc3d04c4f823185542232405&q=63031&days=1&aqi=no&alerts=no"
     r = urequests.get("http://api.weatherapi.com/v1/forecast.json?key=1523873bc3d04c4f823185542232405&q=63031&days=1&aqi=no&alerts=yes")
     weather_data = r.json()
-    #The plan here is to return only the data that I need rather than keep the entire json stored in memory. This
-    #should resolve the memory errors that I was getting when attempting to refresh weather data.
+    # The plan here is to return only the data that I need rather than keep the entire json stored in memory. This
+    # should resolve the memory errors that I was getting when attempting to refresh weather data.
     current_condition = str(weather_data['current']['condition']['text'])
     current_temp = str(weather_data['current']['temp_f'])
     max_temp = weather_data['forecast']['forecastday'][0]['day']['maxtemp_f']
@@ -109,6 +105,8 @@ def get_current_date():
 
 
 def print_wrapped_text(text, y):
+    """Function to print text with wrapping. Requires a string and y
+        value as arguments."""
     x = 0
     y = y
     max_lines = SCREEN_HEIGHT // CHAR_HEIGHT
