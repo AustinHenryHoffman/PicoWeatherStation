@@ -15,19 +15,15 @@ tft = tft_config.config(3)
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True)
 
-
+# Start networking
 with open("./etc/network_config.json", "r") as file:
     config_data = json.load(file)
 print(config_data)
 
 network_info = config_data["network"]
+
 ssid = network_info["ssid"]
 password = network_info["network_password"]
-
-
-# Fill in your network name (ssid) and password here:
-ssid = ssid
-password = password
 wlan.connect(ssid, password)
 
 #AHT 10 init
