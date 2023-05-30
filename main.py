@@ -44,6 +44,20 @@ def center(text):
         st7789.GREEN,
         st7789.BLUE)
 
+"""
+def get_current_forecast():
+    r = urequests.get("http://api.weatherapi.com/v1/forecast.json?key=1523873bc3d04c4f823185542232405&q=63031&days=1&aqi=no&alerts=yes")
+    weather_data = r.json()
+    current_condition = str(weather_data['current']['condition']['text'])
+    current_temp = str(weather_data['current']['temp_f'])
+    max_temp = weather_data['forecast']['forecastday'][0]['day']['maxtemp_f']
+    min_temp = weather_data['forecast']['forecastday'][0]['day']['mintemp_f']
+    rain = weather_data['forecast']['forecastday'][0]['day']['daily_chance_of_rain']
+    moon_phase = weather_data['forecast']['forecastday'][0]['astro']['moon_phase']
+    alerts = weather_data['alerts']['alert'][0]['headline']
+    return [current_condition, current_temp, max_temp, min_temp, rain, moon_phase, alerts]
+"""
+
 
 def get_current_forecast():
     # r = urequests.get("http://api.weatherapi.com/v1/forecast.json?key=1523873bc3d04c4f823185542232405&q=63031&days=2&aqi=no&alerts=no")
@@ -51,8 +65,8 @@ def get_current_forecast():
     # OLD and WORKING "http://api.weatherapi.com/v1/forecast.json?key=1523873bc3d04c4f823185542232405&q=63031&days=1&aqi=no&alerts=no"
     r = urequests.get("http://api.weatherapi.com/v1/forecast.json?key=1523873bc3d04c4f823185542232405&q=63031&days=1&aqi=no&alerts=yes")
     weather_data = r.json()
-    """The plan here is to return only the data that I need rather than keep the entire json stored in memory. This
-    should resolve the memory errors that I was getting when attempting to refresh weather data."""
+    #The plan here is to return only the data that I need rather than keep the entire json stored in memory. This
+    #should resolve the memory errors that I was getting when attempting to refresh weather data.
     current_condition = str(weather_data['current']['condition']['text'])
     current_temp = str(weather_data['current']['temp_f'])
     max_temp = weather_data['forecast']['forecastday'][0]['day']['maxtemp_f']
@@ -96,9 +110,6 @@ def print_wrapped_text(text, y):
             y += CHAR_HEIGHT
             if y >= SCREEN_HEIGHT:
                 break
-
-        # Print the word
-        # disp.draw_text((x, y), word)
         tft.text(smallFont, word, x, y, st7789.RED, st7789.BLUE)
 
         # Update the x coordinate for the next word
@@ -207,12 +218,10 @@ def main():
             current_date = get_current_date()
             weather_data = get_current_forecast()
             print_weather_data(weather_data)
-            print("weather data refreshed")
         # refresh weather data every half hour
         if minute == "59" and int(second) > 58:
             weather_data = get_current_forecast()
             print_weather_data(weather_data)
-            print("weather data refreshed")
         tft.text(bigFont, date, 80, 0, st7789.GREEN, st7789.BLUE)
         tft.text(bigFont, time, 90, 30, st7789.GREEN, st7789.BLUE)
         print_indoor_climate(date, time)
