@@ -8,15 +8,26 @@ import urequests    # handles making and servicing network requests
 from machine import Pin, I2C
 import machine
 import ahtx0
+import json
 
 tft = tft_config.config(3)
 # Connect to network
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True)
 
+
+with open("./etc/network_config.json", "r") as file:
+    config_data = json.load(file)
+print(config_data)
+
+network_info = config_data["network"]
+ssid = network_info["ssid"]
+password = network_info["network_password"]
+
+
 # Fill in your network name (ssid) and password here:
-ssid = 'Tauttechsystems'
-password = 'Ellajane4485!'
+ssid = ssid
+password = password
 wlan.connect(ssid, password)
 
 #AHT 10 init
@@ -56,6 +67,7 @@ def print_pico_time():
     print("Current time:", current_time)
     date_time = [current_date, current_time]
     return date_time
+
 
 def center(text):
     length = 1 if isinstance(text, int) else len(text)
@@ -197,7 +209,7 @@ def main():
     failed_connect = 0
     tft.init()
     tft.fill(st7789.BLACK)
-
+    current_date = ""
     try:
         set_pico_time_from_server()
         weather_data = get_current_forecast()
