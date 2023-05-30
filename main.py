@@ -6,6 +6,7 @@ import vga1_8x16 as smallFont
 import network   # handles connecting to WiFi
 import urequests    # handles making and servicing network requests
 from machine import Pin, I2C
+import machine
 import ahtx0
 
 tft = tft_config.config(3)
@@ -34,6 +35,28 @@ if devices:
 sensor = ahtx0.AHT10(i2c2)
 
 
+def set_pico_time_from_server():
+
+    response = urequests.get("http://192.168.1.4:5000/datetime")
+    data = response.json()
+
+    year, month, day = map(int, data["date"].split("-"))
+    hour, minute, second = map(int, data["time"].split(":"))
+
+    rtc = machine.RTC()
+    rtc.datetime((year, month, day, 0, hour, minute, second, 0))
+
+
+def print_pico_time():
+    rtc = machine.RTC()
+    year, month, day, weekday, hours, minutes, seconds, subseconds = rtc.datetime()
+    current_date = "{:04d}-{:02d}-{:02d}".format(year, month, day)
+    current_time = "{:02d}:{:02d}:{:02d}".format(hours, minutes, seconds)
+    print("Current Date:", current_date)
+    print("Current time:", current_time)
+    date_time = [current_date, current_time]
+    return date_time
+
 def center(text):
     length = 1 if isinstance(text, int) else len(text)
     tft.text(
@@ -43,20 +66,6 @@ def center(text):
         tft.height() // 2 - bigFont.HEIGHT // 2,
         st7789.GREEN,
         st7789.BLUE)
-
-"""
-def get_current_forecast():
-    r = urequests.get("http://api.weatherapi.com/v1/forecast.json?key=1523873bc3d04c4f823185542232405&q=63031&days=1&aqi=no&alerts=yes")
-    weather_data = r.json()
-    current_condition = str(weather_data['current']['condition']['text'])
-    current_temp = str(weather_data['current']['temp_f'])
-    max_temp = weather_data['forecast']['forecastday'][0]['day']['maxtemp_f']
-    min_temp = weather_data['forecast']['forecastday'][0]['day']['mintemp_f']
-    rain = weather_data['forecast']['forecastday'][0]['day']['daily_chance_of_rain']
-    moon_phase = weather_data['forecast']['forecastday'][0]['astro']['moon_phase']
-    alerts = weather_data['alerts']['alert'][0]['headline']
-    return [current_condition, current_temp, max_temp, min_temp, rain, moon_phase, alerts]
-"""
 
 
 def get_current_forecast():
@@ -188,7 +197,9 @@ def main():
     failed_connect = 0
     tft.init()
     tft.fill(st7789.BLACK)
+
     try:
+        set_pico_time_from_server()
         weather_data = get_current_forecast()
         current_date = get_current_date()
         print_weather_data(weather_data)
@@ -200,14 +211,19 @@ def main():
         if failed_connect == 1:
             tft.fill(st7789.BLACK)
         try:
-            r = urequests.get("http://192.168.1.4:5000/datetime")  # Server that returns the current GMT+0 time.
+            #r = urequests.get("http://192.168.1.4:5000/datetime")  # Server that returns the current GMT+0 time.
             failed_connect = 0
-            date = r.json()["date"]
-            time = r.json()["time"]
-            minute = time.split(":")[1]
-            second = time.split(":")[2]
+            date_time = print_pico_time()
+            #date = r.json()["date"]
+            #time = r.json()["time"]
+            date = date_time[0]
+            time = date_time[1]
+            minute = str(date_time[1]).split(":")[1]
+            second = str(date_time[1]).split(":")[2]
+
         except Exception as e:
             print(e)
+            print("Failure at time")
             tft.fill(st7789.BLACK)
             failed_connect = 1
             tft.text(smallFont, "Failed to Reach Time Server.", 0, 0, st7789.GREEN, st7789.BLUE)
