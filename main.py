@@ -33,6 +33,7 @@ if devices:
 # Create the sensor object using I2C
 sensor = ahtx0.AHT10(i2c2)
 
+
 def center(text):
     length = 1 if isinstance(text, int) else len(text)
     tft.text(
@@ -64,7 +65,7 @@ def get_current_forecast():
 
 
 def get_current_date():
-    r = urequests.get("http://192.168.1.4:5000")  # Server that returns the current GMT+0 time.
+    r = urequests.get("http://192.168.1.4:5000/datetime")  # Server that returns the current GMT+0 time.
     date = r.json()["date"]
     return date
 
@@ -150,21 +151,27 @@ def print_weather_data(weather_data):
     # Alerts
     tft.fill_rect(0, 185, 300, smallFont.HEIGHT, st7789.BLACK)
     print_wrapped_text(f"Alert:{weather_data[6]}", 185)
-    #print(int(len(f"Alert:{weather_data[6]}"))*smallFont.WIDTH)
-
-    #if int(len(f"Alert:{weather_data[6]}"))*smallFont.WIDTH) > 320:
 
 
-    #tft.text(smallFont, f"Alert:{weather_data[6]}", 0,
-             #185, st7789.RED, st7789.BLUE)
-
-def print_indoor_climate():
+def print_indoor_climate(date, time):
     temperature = "%0.2f" % (sensor.temperature * 1.8 + 32)
     humidity = "%0.2f" % sensor.relative_humidity
     length = len(str(temperature))+1
     tft.text(smallFont, f"{temperature}F", tft.width() - length * smallFont.WIDTH, 65, st7789.GREEN, st7789.BLUE)
     length = len(str(humidity)) + 1
     tft.text(smallFont, f"{humidity}%", tft.width() - length * smallFont.WIDTH, 85, st7789.GREEN, st7789.BLUE)
+    data = {
+        'date': date,
+        'time': time,
+        'temperature': temperature,
+        'humidity': humidity,
+        'location': 'Master Bedroom'
+    }
+    # log only on even minutes
+    # if int(time.split(":")[1]) % 10 == 0:
+    response = urequests.post('http://192.168.1.4:5000/climate', json=data)
+    print(response.text)
+
 
 def main():
     failed_connect = 0
@@ -176,18 +183,20 @@ def main():
         print_weather_data(weather_data)
 
     except Exception as e:
+        print(e)
         pass
     while True:
         if failed_connect == 1:
             tft.fill(st7789.BLACK)
         try:
-            r = urequests.get("http://192.168.1.4:5000")  # Server that returns the current GMT+0 time.
+            r = urequests.get("http://192.168.1.4:5000/datetime")  # Server that returns the current GMT+0 time.
             failed_connect = 0
             date = r.json()["date"]
             time = r.json()["time"]
             minute = time.split(":")[1]
             second = time.split(":")[2]
         except Exception as e:
+            print(e)
             tft.fill(st7789.BLACK)
             failed_connect = 1
             tft.text(smallFont, "Failed to Reach Time Server.", 0, 0, st7789.GREEN, st7789.BLUE)
@@ -206,7 +215,7 @@ def main():
             print("weather data refreshed")
         tft.text(bigFont, date, 80, 0, st7789.GREEN, st7789.BLUE)
         tft.text(bigFont, time, 90, 30, st7789.GREEN, st7789.BLUE)
-        print_indoor_climate()
+        print_indoor_climate(date, time)
 
 
 main()
