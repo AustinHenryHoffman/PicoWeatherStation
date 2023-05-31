@@ -18,7 +18,6 @@ wlan.active(True)
 # Start networking
 with open("./etc/network_config.json", "r") as file:
     config_data = json.load(file)
-print(config_data)
 
 network_info = config_data["network"]
 ssid = network_info["ssid"]
