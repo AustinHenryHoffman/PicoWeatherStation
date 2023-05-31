@@ -246,13 +246,21 @@ def main():
             continue
         # refresh weather data daily
         if date_time[0] != current_date:
-            current_date = get_current_date()
-            weather_data = get_current_forecast()
-            print_weather_data(weather_data)
+            try:
+                current_date = get_current_date()
+                weather_data = get_current_forecast()
+                print_weather_data(weather_data)
+            except Exception as e:
+                print(e)
+                pass
         # refresh weather data every half hour
         if minute == "59" and int(second) > 58:
-            weather_data = get_current_forecast()
-            print_weather_data(weather_data)
+            try:
+                weather_data = get_current_forecast()
+                print_weather_data(weather_data)
+            except Exception as e:
+                print(e)
+                pass
         tft.text(bigFont, date_time[0], 80, 0, st7789.GREEN, st7789.BLUE)
         tft.text(bigFont, date_time[1], 90, 30, st7789.GREEN, st7789.BLUE)
         print_indoor_climate(date_time[0], date_time[1])
