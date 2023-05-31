@@ -12,18 +12,24 @@ import json
 
 tft = tft_config.config(3)
 
-# Connect to network
-wlan = WLAN(STA_IF)
-wlan.active(True)
+
+class NetworkManager:
+    def __init__(self):
+        self.wlan = WLAN(STA_IF)
+        self.wlan.active(True)
+
+    def connect_to_network(self):
+        with open("./etc/network_config.json", "r") as file:
+            config_data = json.load(file)
+        network_info = config_data["network"]
+        ssid = network_info["ssid"]
+        password = network_info["network_password"]
+        self.wlan.connect(ssid, password)
+
 
 # Start networking
-with open("./etc/network_config.json", "r") as file:
-    config_data = json.load(file)
-
-network_info = config_data["network"]
-ssid = network_info["ssid"]
-password = network_info["network_password"]
-wlan.connect(ssid, password)
+network_manager = NetworkManager()
+network_manager.connect_to_network()
 
 #AHT 10 init
 i2c2 = I2C(1, scl=Pin(27), sda=Pin(26))
@@ -65,8 +71,6 @@ def print_pico_time():
     year, month, day, weekday, hours, minutes, seconds, subseconds = rtc.datetime()
     current_date = "{:04d}-{:02d}-{:02d}".format(year, month, day)
     current_time = "{:02d}:{:02d}:{:02d}".format(hours, minutes, seconds)
-    # print("Current Date:", current_date)
-    # print("Current time:", current_time)
     date_time = [current_date, current_time]
     return date_time
 
