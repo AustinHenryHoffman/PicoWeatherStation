@@ -33,7 +33,7 @@ class AHT10Sensor:
         self.sensor = ahtx0.AHT10(self.i2c)
 
     def get_temperature(self):
-        return "%0.2f" % (self.sensor.temperature * 1.8 + 32)
+        return "%0.2f" % ((self.sensor.temperature * 1.8 + 32)-2.43)  # offset correction based on average of 4 sensors
 
     def get_humidity(self):
         return "%0.2f" % self.sensor.relative_humidity
