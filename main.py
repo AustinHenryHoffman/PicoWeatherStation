@@ -138,15 +138,13 @@ def print_wrapped_text(text, y):
 
 def print_weather_data(weather_data):
     # condition
-    current_condition = str(weather_data[0])
-    print(current_condition)
-    if current_condition == "Sunny":
+    if weather_data[0] == "Sunny":
         tft.fill_rect(0, 65, 160, smallFont.HEIGHT, st7789.BLACK)
         tft.text(smallFont, str(weather_data[0]), 0, 65, st7789.YELLOW, st7789.BLUE)
-    elif current_condition == "Clear":
+    elif weather_data[0] == "Clear":
         tft.fill_rect(0, 65, 160, smallFont.HEIGHT, st7789.BLACK)
         tft.text(smallFont, str(weather_data[0]), 0, 65, st7789.WHITE, st7789.BLUE)
-    elif current_condition == "Partly cloudy":
+    elif weather_data[0] == "Partly cloudy":
         tft.fill_rect(0, 65, 160, smallFont.HEIGHT, st7789.BLACK)
         tft.text(smallFont, str(weather_data[0]), 0, 65, st7789.BLACK, st7789.BLUE)
     else:
@@ -155,8 +153,8 @@ def print_weather_data(weather_data):
     # current temp
     tft.text(smallFont, f"Current Temp:{weather_data[1]}F", 0, 85, st7789.GREEN, st7789.BLUE)
     # max temp
-    max_temp = weather_data[2]
-    if float(max_temp) >= float(90):
+    # max_temp = weather_data[2]
+    if float(weather_data[2]) >= float(90):
         tft.text(smallFont, f"High Temp:{weather_data[2]}F", 0, 105,
                  st7789.RED, st7789.BLUE)
     else:
@@ -221,13 +219,8 @@ def main():
         if failed_connect == 1:
             tft.fill(st7789.BLACK)
         try:
-            #r = urequests.get("http://192.168.1.4:5000/datetime")  # Server that returns the current GMT+0 time.
             failed_connect = 0
             date_time = print_pico_time()
-            #date = r.json()["date"]
-            #time = r.json()["time"]
-            date = date_time[0]
-            time = date_time[1]
             minute = str(date_time[1]).split(":")[1]
             second = str(date_time[1]).split(":")[2]
 
@@ -240,7 +233,7 @@ def main():
             utime.sleep(2)
             continue
         # refresh weather data daily
-        if date != current_date:
+        if date_time[0] != current_date:
             current_date = get_current_date()
             weather_data = get_current_forecast()
             print_weather_data(weather_data)
@@ -248,9 +241,9 @@ def main():
         if minute == "59" and int(second) > 58:
             weather_data = get_current_forecast()
             print_weather_data(weather_data)
-        tft.text(bigFont, date, 80, 0, st7789.GREEN, st7789.BLUE)
-        tft.text(bigFont, time, 90, 30, st7789.GREEN, st7789.BLUE)
-        print_indoor_climate(date, time)
+        tft.text(bigFont, date_time[0], 80, 0, st7789.GREEN, st7789.BLUE)
+        tft.text(bigFont, date_time[1], 90, 30, st7789.GREEN, st7789.BLUE)
+        print_indoor_climate(date_time[0], date_time[1])
 
 
 main()
