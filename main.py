@@ -11,6 +11,7 @@ import ahtx0
 import json
 
 tft = tft_config.config(3)
+
 # Connect to network
 wlan = WLAN(STA_IF)
 wlan.active(True)
