@@ -27,12 +27,23 @@ class NetworkManager:
         self.wlan.connect(ssid, password)
 
 
+class AHT10Sensor:
+    def __init__(self):
+        self.i2c = I2C(1, scl=Pin(27), sda=Pin(26))
+        self.sensor = ahtx0.AHT10(self.i2c)
+
+    def get_temperature(self):
+        return "%0.2f" % (self.sensor.temperature * 1.8 + 32)
+
+    def get_humidity(self):
+        return "%0.2f" % self.sensor.relative_humidity
+
+
 # Start networking
 network_manager = NetworkManager()
 network_manager.connect_to_network()
-
-#AHT 10 init
-i2c2 = I2C(1, scl=Pin(27), sda=Pin(26))
+# instantiate aht10 sensor
+aht10 = AHT10Sensor()
 
 """
 used to get the device i2c address which needs to be updated in the ahtx0 driver
@@ -42,9 +53,6 @@ if devices:
     for d in devices:
         print(hex(d))
 """
-
-# Create the sensor object using I2C
-sensor = ahtx0.AHT10(i2c2)
 
 SCREEN_WIDTH = 320
 SCREEN_HEIGHT = 240
@@ -180,8 +188,8 @@ def print_weather_data(weather_data):
 
 
 def print_indoor_climate(date, time):
-    temperature = "%0.2f" % (sensor.temperature * 1.8 + 32)
-    humidity = "%0.2f" % sensor.relative_humidity
+    temperature = aht10.get_temperature()
+    humidity = aht10.get_humidity()
     length = len("Indoor Climate:")
     tft.text(smallFont, "Indoor Climate:", tft.width() - length * smallFont.WIDTH, 65, st7789.GREEN, st7789.BLUE)
     length = len(str(temperature))+1
