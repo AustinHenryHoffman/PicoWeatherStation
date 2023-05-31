@@ -31,8 +31,15 @@ class AHT10Sensor:
     def __init__(self):
         self.i2c = I2C(1, scl=Pin(27), sda=Pin(26))
         self.sensor = ahtx0.AHT10(self.i2c)
+        # used to get the device i2c address which needs to be updated in the ahtx0 driver
+        # devices = self.i2c.scan()
+        # 0x39
+        # if devices:
+            # for d in devices:
+                # print(hex(d))
 
     def get_temperature(self):
+        # getting an error from the sensor here OSError: [Errno 5] EIO
         return "%0.2f" % ((self.sensor.temperature * 1.8 + 32)-2.43)  # offset correction based on average of 4 sensors
 
     def get_humidity(self):
@@ -44,15 +51,6 @@ network_manager = NetworkManager()
 network_manager.connect_to_network()
 # instantiate aht10 sensor
 aht10 = AHT10Sensor()
-
-"""
-used to get the device i2c address which needs to be updated in the ahtx0 driver
-devices = i2c2.scan()
-0x39
-if devices:
-    for d in devices:
-        print(hex(d))
-"""
 
 SCREEN_WIDTH = 320
 SCREEN_HEIGHT = 240
