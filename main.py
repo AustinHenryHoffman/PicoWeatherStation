@@ -3,7 +3,7 @@ import st7789
 import tft_config
 import vga2_bold_16x32 as bigFont
 import vga1_8x16 as smallFont
-import network   # handles connecting to WiFi
+from network import WLAN, STA_IF   # handles connecting to WiFi
 import urequests    # handles making and servicing network requests
 from machine import Pin, I2C
 import machine
@@ -12,7 +12,7 @@ import json
 
 tft = tft_config.config(3)
 # Connect to network
-wlan = network.WLAN(network.STA_IF)
+wlan = WLAN(STA_IF)
 wlan.active(True)
 
 # Start networking
