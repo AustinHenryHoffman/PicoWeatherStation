@@ -52,10 +52,6 @@ network_manager.connect_to_network()
 # instantiate aht10 sensor
 aht10 = AHT10Sensor()
 
-SCREEN_WIDTH = 320
-SCREEN_HEIGHT = 240
-CHAR_WIDTH = 6  # Width of each character
-CHAR_HEIGHT = 16  # Height of each character
 # print(f"small Font width: {smallFont.WIDTH}")
 # print(f"small Font height: {smallFont.HEIGHT}")
 
@@ -114,36 +110,71 @@ def get_current_date():
     return date
 
 
-def print_wrapped_text(text, y):
+def print_wrapped_text(text, start_y):
     """Function to print text with wrapping. Requires a string and y
         value as arguments."""
+    SCREEN_WIDTH = 320
+    SCREEN_HEIGHT = 240
+    CHAR_WIDTH = 8  # Width of each character
+    CHAR_HEIGHT = 16  # Height of each character
+
     x = 0
-    y = y
-    max_lines = SCREEN_HEIGHT // CHAR_HEIGHT
-    max_chars_per_line = SCREEN_WIDTH // CHAR_WIDTH
+    y = start_y
 
-    # Split the text into words
     words = text.split()
-
     for word in words:
         word_length = len(word)
-        if x + word_length * CHAR_WIDTH >= SCREEN_WIDTH:
+
+        if x + word_length * CHAR_HEIGHT >= SCREEN_WIDTH:
             # If the word exceeds the screen width, move to the next line
             x = 0
             y += CHAR_HEIGHT
             if y >= SCREEN_HEIGHT:
                 break
-        tft.text(smallFont, word, x, y, st7789.RED, st7789.BLUE)
 
-        # Update the x coordinate for the next word
-        x += word_length * CHAR_WIDTH + CHAR_WIDTH
+        # Determine the remaining space on the current line
+        remaining_space = SCREEN_WIDTH - x
 
-        if x >= SCREEN_WIDTH:
-            # If the x coordinate exceeds the screen width, move to the next line
+        if word_length * CHAR_HEIGHT > remaining_space:
+            # The word won't fit on the current line, so move to the next line
             x = 0
             y += CHAR_HEIGHT
             if y >= SCREEN_HEIGHT:
                 break
+
+            # Calculate the number of characters that will fit on the new line
+            max_chars_on_line = SCREEN_WIDTH // CHAR_HEIGHT
+
+            # Split the word into multiple parts that fit on the line
+            parts = [word[i:i + max_chars_on_line] for i in range(0, len(word), max_chars_on_line)]
+
+            # Print the parts on the new line with spaces in between
+            for i, part in enumerate(parts):
+                print(parts)
+                tft.text(smallFont, part, x, y + (i * CHAR_HEIGHT), st7789.RED, st7789.BLUE)
+                x = 0
+
+            # Update the x and y coordinates for the next word
+            x = (len(parts[-1]) * CHAR_WIDTH)
+            y += CHAR_HEIGHT
+
+        else:
+            # Print the word
+            print(word)
+            tft.text(smallFont, word, x, y, st7789.RED, st7789.BLUE)
+
+            x += (word_length * CHAR_WIDTH)
+
+            if x >= SCREEN_WIDTH:
+                # If the x coordinate exceeds the screen width, move to the next line
+                x = 0
+                y += CHAR_HEIGHT
+                if y >= SCREEN_HEIGHT:
+                    break
+            # Add spaces if there is enough remaining space
+            if x + CHAR_WIDTH <= SCREEN_WIDTH:
+                tft.text(smallFont, ' ', x, y, st7789.RED, st7789.BLUE)
+                x += CHAR_WIDTH
 
 
 def print_weather_data(weather_data):
