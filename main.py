@@ -1,4 +1,4 @@
-import utime
+from utime import sleep
 import st7789
 import tft_config
 import vga2_bold_16x32 as bigFont
@@ -25,7 +25,11 @@ class NetworkManager:
         ssid = network_info["ssid"]
         password = network_info["network_password"]
         self.wlan.connect(ssid, password)
+        while not self.wlan.isconnected():
+            sleep(1)
 
+    def is_connected(self):
+        return self.wlan.isconnected()
 
 class AHT10Sensor:
     def __init__(self):
@@ -49,6 +53,7 @@ class AHT10Sensor:
 # Start networking
 network_manager = NetworkManager()
 network_manager.connect_to_network()
+sleep(3)
 # instantiate aht10 sensor
 aht10 = AHT10Sensor()
 
@@ -269,7 +274,7 @@ def main():
             tft.fill(st7789.BLACK)
             failed_connect = 1
             tft.text(smallFont, "Failed to Reach Time Server.", 0, 0, st7789.GREEN, st7789.BLUE)
-            utime.sleep(2)
+            sleep(2)
             continue
         # refresh weather data daily
         if date_time[0] != current_date:
