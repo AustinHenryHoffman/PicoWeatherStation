@@ -294,7 +294,7 @@ def main():
                 print(e)
                 pass
         tft.text(bigFont, date_time[0], 80, 0, st7789.GREEN, st7789.BLUE)
-        tft.text(bigFont, date_time[1], 90, 30, st7789.GREEN, st7789.BLUE)
+        tft.text(bigFont, date_time[1], 95, 30, st7789.GREEN, st7789.BLUE)
         print_indoor_climate(date_time[0], date_time[1])
 
 
