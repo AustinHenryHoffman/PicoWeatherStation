@@ -150,7 +150,6 @@ def print_wrapped_text(text, start_y):
 
             # Print the parts on the new line with spaces in between
             for i, part in enumerate(parts):
-                print(parts)
                 tft.text(smallFont, part, x, y + (i * CHAR_HEIGHT), st7789.RED, st7789.BLUE)
                 x = 0
 
@@ -160,7 +159,6 @@ def print_wrapped_text(text, start_y):
 
         else:
             # Print the word
-            print(word)
             tft.text(smallFont, word, x, y, st7789.RED, st7789.BLUE)
 
             x += (word_length * CHAR_WIDTH)
