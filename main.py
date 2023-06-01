@@ -57,6 +57,10 @@ sleep(3)
 # instantiate aht10 sensor
 aht10 = AHT10Sensor()
 
+SCREEN_WIDTH = 320
+SCREEN_HEIGHT = 240
+CHAR_WIDTH = 8  # Width of each character
+CHAR_HEIGHT = 16  # Height of each character
 # print(f"small Font width: {smallFont.WIDTH}")
 # print(f"small Font height: {smallFont.HEIGHT}")
 
@@ -93,6 +97,12 @@ def center(text):
         st7789.BLUE)
 
 
+def print_centered_text(text, y):
+    text_width = len(text) * CHAR_WIDTH
+    x = (SCREEN_WIDTH - text_width) // 2
+    tft.text(smallFont, text, x, y, st7789.RED, st7789.BLUE)
+
+
 def get_current_forecast():
     r = urequests.get("http://api.weatherapi.com/v1/forecast.json?key=1523873bc3d04c4f823185542232405&q=63031&days=1&aqi=no&alerts=yes")
     weather_data = r.json()
@@ -118,10 +128,6 @@ def get_current_date():
 def print_wrapped_text(text, start_y):
     """Function to print text with wrapping. Requires a string and y
         value as arguments."""
-    SCREEN_WIDTH = 320
-    SCREEN_HEIGHT = 240
-    CHAR_WIDTH = 8  # Width of each character
-    CHAR_HEIGHT = 16  # Height of each character
 
     x = 0
     y = start_y
@@ -195,9 +201,13 @@ def print_weather_data(weather_data):
         tft.fill_rect(0, 65, 160, smallFont.HEIGHT, st7789.BLACK)
         tft.text(smallFont, str(weather_data[0]), 0, 65, st7789.GREEN, st7789.BLUE)
     # current temp
-    tft.text(smallFont, f"Current Temp:{weather_data[1]}F", 0, 85, st7789.GREEN, st7789.BLUE)
+    if float(weather_data[1]) >= float(90):
+        tft.text(smallFont, f"Current Temp:{weather_data[1]}F", 0, 85,
+                 st7789.RED, st7789.BLUE)
+    else:
+        tft.text(smallFont, f"Current Temp:{weather_data[1]}F  ", 0, 85,
+                 st7789.GREEN, st7789.BLUE)
     # max temp
-    # max_temp = weather_data[2]
     if float(weather_data[2]) >= float(90):
         tft.text(smallFont, f"High Temp:{weather_data[2]}F", 0, 105,
                  st7789.RED, st7789.BLUE)
