@@ -128,7 +128,7 @@ def get_current_date():
     return date
 
 
-def print_wrapped_text(text, start_y):
+def print_wrapped_text(text, start_y, text_color):
     """Function to print text with wrapping. Requires a string and y
         value as arguments."""
 
@@ -164,7 +164,7 @@ def print_wrapped_text(text, start_y):
 
             # Print the parts on the new line with spaces in between
             for i, part in enumerate(parts):
-                tft.text(smallFont, part, x, y + (i * CHAR_HEIGHT), st7789.RED, st7789.BLUE)
+                tft.text(smallFont, part, x, y + (i * CHAR_HEIGHT), text_color, st7789.BLUE)
                 x = 0
 
             # Update the x and y coordinates for the next word
@@ -173,7 +173,7 @@ def print_wrapped_text(text, start_y):
 
         else:
             # Print the word
-            tft.text(smallFont, word, x, y, st7789.RED, st7789.BLUE)
+            tft.text(smallFont, word, x, y, text_color, st7789.BLUE)
 
             x += (word_length * CHAR_WIDTH)
 
@@ -185,7 +185,7 @@ def print_wrapped_text(text, start_y):
                     break
             # Add spaces if there is enough remaining space
             if x + CHAR_WIDTH <= SCREEN_WIDTH:
-                tft.text(smallFont, ' ', x, y, st7789.RED, st7789.BLUE)
+                tft.text(smallFont, ' ', x, y, text_color, st7789.BLUE)
                 x += CHAR_WIDTH
 
 
@@ -229,7 +229,11 @@ def print_weather_data(weather_data):
              165, st7789.GREEN, st7789.BLUE)
     # Alerts
     tft.fill_rect(0, 185, 300, smallFont.HEIGHT, st7789.BLACK)
-    print_wrapped_text(f"Alert:{weather_data[6]}", 185)
+    if weather_data[6] == "NO ALERTS CURRENTLY.":
+        print_wrapped_text(f"Alert:{weather_data[6]}", 185, st7789.YELLOW)
+    else:
+        print_wrapped_text(f"Alert:{weather_data[6]}", 185, st7789.RED)
+
 
 
 def print_indoor_climate(date, time):
