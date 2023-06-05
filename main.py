@@ -114,7 +114,10 @@ def get_current_forecast():
     min_temp = weather_data['forecast']['forecastday'][0]['day']['mintemp_f']
     rain = weather_data['forecast']['forecastday'][0]['day']['daily_chance_of_rain']
     moon_phase = weather_data['forecast']['forecastday'][0]['astro']['moon_phase']
-    alerts = weather_data['alerts']['alert'][0]['headline']
+    try:
+        alerts = weather_data['alerts']['alert'][0]['headline']
+    except Exception as e:
+        alerts = str("NO ALERTS CURRENTLY.")
     weather_data = [current_condition, current_temp, max_temp, min_temp, rain, moon_phase, alerts]
     return weather_data
 
@@ -251,6 +254,7 @@ def print_indoor_climate(date, time):
         response = urequests.post('http://192.168.1.4:5000/climate', json=data)
         print(response.text)
     except Exception as e:
+        print("print_indoor_climate:")
         print(e)
         pass
 
@@ -267,6 +271,7 @@ def main():
         print_weather_data(weather_data)
 
     except Exception as e:
+        print("Main first try:")
         print(e)
         pass
     while True:
