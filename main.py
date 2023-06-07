@@ -31,6 +31,7 @@ class NetworkManager:
     def is_connected(self):
         return self.wlan.isconnected()
 
+
 class AHT10Sensor:
     def __init__(self):
         self.i2c = I2C(1, scl=Pin(27), sda=Pin(26))
@@ -228,12 +229,12 @@ def print_weather_data(weather_data):
     tft.text(smallFont, f"Moon Phase:{weather_data[5]}", 0,
              165, st7789.GREEN, st7789.BLUE)
     # Alerts
-    tft.fill_rect(0, 185, 300, smallFont.HEIGHT, st7789.BLACK)
+    tft.fill_rect(0, 185, 320, smallFont.HEIGHT, st7789.BLACK)
+    tft.fill_rect(0, 205, 320, smallFont.HEIGHT, st7789.BLACK)
     if weather_data[6] == "NO ALERTS CURRENTLY.":
         print_wrapped_text(f"Alert:{weather_data[6]}", 185, st7789.YELLOW)
     else:
         print_wrapped_text(f"Alert:{weather_data[6]}", 185, st7789.RED)
-
 
 
 def print_indoor_climate(date, time):
