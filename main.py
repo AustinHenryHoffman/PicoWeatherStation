@@ -45,11 +45,16 @@ class AHT10Sensor:
 
     def get_temperature(self):
         # getting an error from the sensor here OSError: [Errno 5] EIO
-        return "%0.2f" % ((self.sensor.temperature * 1.8 + 32)-2.43)  # offset correction based on average of 4 sensors
+        try:
+            return "%0.2f" % ((self.sensor.temperature * 1.8 + 32)-2.43)  # offset correction based on average of 4 sensors
+        except OSError as err:
+            return 00.00
 
     def get_humidity(self):
-        return "%0.2f" % self.sensor.relative_humidity
-
+        try:
+            return "%0.2f" % self.sensor.relative_humidity
+        except OSError as err:
+            return 00.00
 
 # Start networking
 network_manager = NetworkManager()
