@@ -236,7 +236,7 @@ def print_weather_data(weather_data):
     # Alerts
     # tft.fill_rect(0, 185, 320, smallFont.HEIGHT, st7789.BLACK)
     # tft.fill_rect(0, 205, 320, smallFont.HEIGHT, st7789.BLACK)
-    tft.fill_rect(185, 320, 55, 1, st7789.BLACK)
+    tft.fill_rect(0, 185, 320, 55, st7789.BLACK)
     if weather_data[6] == "NO ALERTS CURRENTLY.":
         print_wrapped_text(f"Alert:{weather_data[6]}", 185, st7789.YELLOW)
     else:
