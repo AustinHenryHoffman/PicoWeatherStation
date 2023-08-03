@@ -1,4 +1,4 @@
-from utime import sleep
+from utime import sleep, time
 import st7789
 import tft_config
 import vga2_bold_16x32 as bigFont
@@ -11,6 +11,7 @@ import ahtx0
 import json
 
 tft = tft_config.config(3)
+
 
 
 class NetworkManager:
@@ -208,7 +209,7 @@ def print_weather_data(weather_data):
         tft.text(smallFont, str(weather_data[0]), 0, 65, st7789.BLACK, st7789.BLUE)
     else:
         tft.fill_rect(0, 65, 160, smallFont.HEIGHT, st7789.BLACK)
-        tft.text(smallFont, str(weather_data[0]), 0, 65, st7789.GREEN, st7789.BLUE)
+        tft.text(smallFont, str(weather_data[0])[:155], 0, 65, st7789.GREEN, st7789.BLUE)
     # current temp
     if float(weather_data[1]) >= float(90):
         tft.text(smallFont, f"Current Temp:{weather_data[1]}F", 0, 85,
@@ -243,7 +244,8 @@ def print_weather_data(weather_data):
         print_wrapped_text(f"Alert:{weather_data[6]}", 185, st7789.RED)
 
 
-def print_indoor_climate(date, time):
+def print_indoor_climate(date, actual_time):
+    global last_db_write_time
     temperature = aht10.get_temperature()
     humidity = aht10.get_humidity()
     length = len("Indoor Climate:")
@@ -252,22 +254,32 @@ def print_indoor_climate(date, time):
     tft.text(smallFont, f"{temperature}F", tft.width() - length * smallFont.WIDTH, 85, st7789.GREEN, st7789.BLUE)
     length = len(str(humidity)) + 1
     tft.text(smallFont, f"{humidity}%", tft.width() - length * smallFont.WIDTH, 105, st7789.GREEN, st7789.BLUE)
-    data = {
-        'date': date,
-        'time': time,
-        'temperature': temperature,
-        'humidity': humidity,
-        'location': 'Master Bedroom'
-    }
-    # log only on even minutes
-    # if int(time.split(":")[1]) % 10 == 0:
-    try:
-        response = urequests.post('http://192.168.1.4:5000/climate', json=data)
-        print(response.text)
-    except Exception as e:
-        print("print_indoor_climate:")
-        print(e)
-        pass
+
+    current_time = time()
+    if current_time - last_db_write_time >= 300:
+        data = {
+            'date': date,
+            'time': actual_time,
+            'temperature': temperature,
+            'humidity': humidity,
+            'location': 'Master Bedroom'
+        }
+        # log only on even minutes
+        # if int(time.split(":")[1]) % 10 == 0:
+
+        try:
+            response = urequests.post('http://192.168.1.4:5000/climate', json=data)
+            print("Posting indoor climate data.")
+            print(response.text)
+
+        except Exception as e:
+            print("print_indoor_climate:")
+            print(e)
+            pass
+        last_db_write_time = current_time
+
+
+last_db_write_time = 0
 
 
 def main():
