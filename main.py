@@ -13,7 +13,6 @@ import json
 tft = tft_config.config(3)
 
 
-
 class NetworkManager:
     def __init__(self):
         self.wlan = WLAN(STA_IF)
@@ -56,6 +55,7 @@ class AHT10Sensor:
             return "%0.2f" % self.sensor.relative_humidity
         except OSError as err:
             return 00.00
+
 
 # Start networking
 network_manager = NetworkManager()
@@ -209,6 +209,7 @@ def print_weather_data(weather_data):
         tft.text(smallFont, str(weather_data[0]), 0, 65, st7789.BLACK, st7789.BLUE)
     else:
         tft.fill_rect(0, 65, 160, smallFont.HEIGHT, st7789.BLACK)
+        # slice the general forcast info so that it doesn't overlap more than half the screen.
         tft.text(smallFont, str(weather_data[0])[:155], 0, 65, st7789.GREEN, st7789.BLUE)
     # current temp
     if float(weather_data[1]) >= float(90):
