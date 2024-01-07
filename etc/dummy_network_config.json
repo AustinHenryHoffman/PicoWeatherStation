@@ -1,6 +1,9 @@
 {
   "network": {
-  "network_password": "",
-  "ssid": ""
-    }
+    "network_password": "test!",
+    "ssid": "test"
+  },
+  "device": {
+    "room": "Master Bedroom"
+  }
 }
