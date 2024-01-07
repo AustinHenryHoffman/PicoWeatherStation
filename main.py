@@ -264,8 +264,9 @@ def print_indoor_climate(date, actual_time):
             'time': actual_time,
             'temperature': temperature,
             'humidity': humidity,
-            'location': 'Master Bedroom'
-        }
+            'location': 'Second Bedroom'
+        }  # Master Bedroom, Second Bedroom, Living Room  THIS VARIABLE NEEDS TO GET PULLED FROM A CONFIG. FAILURE TO CHANGE THIS WILL RUIN DATA.
+
         # log only on even minutes
         # if int(time.split(":")[1]) % 10 == 0:
 
@@ -316,12 +317,13 @@ def main():
             tft.text(smallFont, "Failed to Reach Time Server.", 0, 0, st7789.GREEN, st7789.BLUE)
             sleep(2)
             continue
-        # refresh weather data daily
+        # refresh weather  and time data daily
         if date_time[0] != current_date:
             try:
                 current_date = get_current_date()
                 weather_data = get_current_forecast()
                 print_weather_data(weather_data)
+                set_pico_time_from_server()
             except Exception as e:
                 print(e)
                 pass
