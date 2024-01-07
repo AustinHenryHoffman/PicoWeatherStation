@@ -19,7 +19,7 @@ class NetworkManager:
         self.wlan.active(True)
 
     def connect_to_network(self):
-        with open("./etc/network_config.json", "r") as file:
+        with open("./etc/config.json", "r") as file:
             config_data = json.load(file)
         network_info = config_data["network"]
         ssid = network_info["ssid"]
@@ -246,7 +246,7 @@ def print_weather_data(weather_data):
         print_wrapped_text(f"Alert:{weather_data[6]}", 185, st7789.RED)
 
 
-def print_indoor_climate(date, actual_time):
+def print_indoor_climate(date, actual_time, location):
     global last_db_write_time
     temperature = aht10.get_temperature()
     humidity = aht10.get_humidity()
@@ -264,7 +264,7 @@ def print_indoor_climate(date, actual_time):
             'time': actual_time,
             'temperature': temperature,
             'humidity': humidity,
-            'location': 'Second Bedroom'
+            'location': location
         }  # Master Bedroom, Second Bedroom, Living Room  THIS VARIABLE NEEDS TO GET PULLED FROM A CONFIG. FAILURE TO CHANGE THIS WILL RUIN DATA.
 
         # log only on even minutes
@@ -286,6 +286,13 @@ last_db_write_time = 0
 
 
 def main():
+
+    # get device location from config. It was hard coded before...bad.
+    with open("./etc/config.json", "r") as file:
+        config_data = json.load(file)
+    device_info = config_data["device"]
+    device_location = device_info["room"]
+
     failed_connect = 0
     tft.init()
     tft.fill(st7789.BLACK)
@@ -337,7 +344,7 @@ def main():
                 pass
         tft.text(bigFont, date_time[0], 80, 0, st7789.GREEN, st7789.BLUE)
         tft.text(bigFont, date_time[1], 95, 30, st7789.GREEN, st7789.BLUE)
-        print_indoor_climate(date_time[0], date_time[1])
+        print_indoor_climate(date_time[0], date_time[1], device_location)
 
 
 main()
