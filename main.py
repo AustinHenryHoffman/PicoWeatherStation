@@ -199,19 +199,20 @@ def print_wrapped_text(text, start_y, text_color):
 def print_weather_data(weather_data):
     # condition
     if weather_data[0] == "Sunny":
-        tft.fill_rect(0, 65, 160, smallFont.HEIGHT, st7789.BLACK)
-        tft.text(smallFont, str(weather_data[0])[:155], 0, 65, st7789.YELLOW, st7789.BLUE)
+        tft.fill_rect(0, 65, 200, smallFont.HEIGHT, st7789.BLACK)
+        tft.text(smallFont, str(weather_data[0])[:25], 0, 65, st7789.YELLOW, st7789.BLUE)
     elif weather_data[0] == "Clear":
-        tft.fill_rect(0, 65, 160, smallFont.HEIGHT, st7789.BLACK)
-        tft.text(smallFont, str(weather_data[0])[:155], 0, 65, st7789.WHITE, st7789.BLUE)
+        tft.fill_rect(0, 65, 200, smallFont.HEIGHT, st7789.BLACK)
+        tft.text(smallFont, str(weather_data[0])[:25], 0, 65, st7789.WHITE, st7789.BLUE)
     elif weather_data[0] == "Partly cloudy":
-        tft.fill_rect(0, 65, 160, smallFont.HEIGHT, st7789.BLACK)
-        tft.text(smallFont, str(weather_data[0])[:155], 0, 65, st7789.BLACK, st7789.BLUE)
+        tft.fill_rect(0, 65, 200, smallFont.HEIGHT, st7789.BLACK)
+        tft.text(smallFont, str(weather_data[0])[:25], 0, 65, st7789.BLACK, st7789.BLUE)
     else:
-        tft.fill_rect(0, 65, 160, smallFont.HEIGHT, st7789.BLACK)
-        # slice the general forcast info so that it doesn't overlap more than half the screen.
-        tft.text(smallFont, str(weather_data[0])[:155], 0, 65, st7789.GREEN, st7789.BLUE)
-        # tft.text(smallFont, str("This is a ridicouly long string and needs to be reduced")[:155], 0, 65, st7789.GREEN, st7789.BLUE)
+        tft.fill_rect(0, 65, 200, smallFont.HEIGHT, st7789.BLACK)
+        # slice the general forecast info so that it doesn't overlap more than half the screen.
+        tft.text(smallFont, str(weather_data[0])[:25], 0, 65, st7789.GREEN, st7789.BLUE)
+        # tft.text(smallFont, str("1234567891011121314151617181920212223")[:25], 0, 65, st7789.GREEN, st7789.BLUE)
+
     # current temp
     if float(weather_data[1]) >= float(90):
         tft.text(smallFont, f"Current Temp:{weather_data[1]}F", 0, 85,
